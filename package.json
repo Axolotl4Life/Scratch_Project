@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Axolotl4Life/Scratch_Project#readme",
   "dependencies": {
     "express": "^4.18.1",
+    "express-session": "^1.17.3",
     "mongoose": "^6.6.1",
     "node-fetch": "^3.2.10",
     "react": "^18.2.0",
