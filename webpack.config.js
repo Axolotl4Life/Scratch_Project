@@ -40,7 +40,10 @@ module.exports = {
       directory: path.resolve(__dirname, 'build') // unsure about contents of static
     },
     proxy: {
-      '/api': 'http://localhost:3000'
+      '/projects/**':{
+        target: 'http://localhost:3000',
+        secure: false
+      } 
     }
   }
 };
