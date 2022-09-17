@@ -1,7 +1,7 @@
 //dependencies
 import React, { Component, useState, useEffect } from 'react';
 
-const FormContainer = () => {
+const taskCreator = () => {
 
   // declare state for add task field
   const [task, setTask] = useState('');
@@ -17,16 +17,18 @@ const FormContainer = () => {
             type='text'
             id="textBox"
             placeholder='Set up webpack...'
-            value={task}            
             required
+            value={task}
+            onChange={(e) => setTask(e.target.value)}            
           />
         </label>
-        <button className="newTask" id="sprintBut" onChange={(e) => setTask(e.target.value)}>
+        <button className="newTask" id="sprintBut" >
         Add Sprint
         </button>
+        <p>{task}</p>
       </form>      
     </div>
   );
 };
 
-export default FormContainer;
+export default taskCreator;
