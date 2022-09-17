@@ -9,8 +9,8 @@ mongoose.connect(DB_URI, {
   useUnifiedTopology: true,
   dbName: 'SCRUM_Project'
 })
-.then(() => console.log('Connected to Mongo DB'))
-.catch(err => console.log(err));
+  .then(() => console.log('Connected to Mongo DB'))
+  .catch(err => console.log(err));
 
 
 // TODO begin creating schemas below
@@ -37,7 +37,8 @@ const Session = mongoose.model('session', sessionSchema);
 // ? Implement as Linked List >> strecth 
 const projectSchema = new Schema({
   // tasks, progress
-  tasks: {type: Object, default: {}},
+  name: {type: String, required: true},
+  // tasks: { type: Schema.Types.ObjectId, ref: 'task'},
   progress: {
     to_be_started: {type: Object, default: {}},
     in_progress: {type: Object, default: {}},
@@ -48,8 +49,17 @@ const projectSchema = new Schema({
 
 const Project = mongoose.model('project', projectSchema);
 
+
+const taskSchema = new Schema({
+  // tasks, progress
+  task: {type: String, required: true}
+});
+
+const Task = mongoose.model('task', taskSchema);
+
 module.exports = {
   User,
   Session,
-  Project
+  Project,
+  Task
 };
