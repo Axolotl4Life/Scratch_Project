@@ -1,4 +1,4 @@
-const {Project} = require('../models/models');
+const {Project, Task} = require('../models/models');
 
 
 const projectController = {};
@@ -12,6 +12,7 @@ projectController.getAllTasks = async(req, res, next) => {
     // second argument is name of property we want to display
     const searchResults = await Project.find({}, ['tasks']);
     res.locals.allTasks = searchResults;
+
     return next();
   } 
   catch (error) {
@@ -26,7 +27,10 @@ projectController.createNewTask = async(req, res, next) => {
   try {
     // we get input from front end here as a json from body
     const {task} = req.body;
-    //! hold up on this right now
+    
+    const newTask = await Task.create({task: task});
+    res.locals.newTask = newTask;
+
     return next();
   } 
   catch (error) {
@@ -44,10 +48,12 @@ projectController.editTask = async(req, res, next) => {
     const {update} = req.body;
     
     // first argument is the filer-what to find, second is what to update it to, third argument is to return the updated task
-    const updatedTask = await Project.findOneAndUpdate({});
+    const updatedTask = await Project.findByIdAndUpdate({ _id: id}, {update});
+    res.locals.updatedTask = updatedTask;
     
     return next();
-  } catch (error) {
+  } 
+  catch (error) {
     return next({
       log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
       message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
@@ -57,7 +63,12 @@ projectController.editTask = async(req, res, next) => {
 
 projectController.updateTaskProgress = async(req, res, next) => {
   try {
-
+    
+    // receive the progress bar it's already in
+    // if just created move it to to_be_started
+    // else check if it's in to_be_started, if so move to in_progress
+    // else move to completed
+    
     return next();
   } catch (error) {
     return next({
@@ -69,8 +80,15 @@ projectController.updateTaskProgress = async(req, res, next) => {
 
 projectController.deleteTask = async(req, res, next) => {
   try {
+    // we get input from front end here as a json from body
+    const {id} = req.query; 
+     
+    // finds by id and deletes it
+    const deletedTask = await Project.findByIdAndDelete({ _id: id});
+    res.locals.deletedTask = deletedTask;
     return next();
-  } catch (error) {
+  } 
+  catch (error) {
     return next({
       log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
       message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
