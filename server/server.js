@@ -6,6 +6,8 @@ const PORT = 3000;
 // TODO LIST ANY ROUTERS BELOW
 
 // const apiRouter = require('./routes/api');
+const projectRouter = require('./routes/projects');
+const userRouter = require('./routes/users');
 
 // parsing body
 app.use(express.json());
@@ -15,14 +17,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.resolve(__dirname, '')));
 
 // TODO route handlers
-
+app.use('/projects', projectRouter);
 
 
 // TODO get request for Homepage
-
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../client/index.html'));
+});;
 
 // ? get request for signup/login ?
+app.get('/signup', (req, res) => {
+  return res.sendFile(path.resolve(__dirname, '../client/signup.html'));
+});
 
+// ? get request for '/projects'
+app.get('/projects', (req, res) => {
+  res.status.sendFile(path.resolve(__dirname, '../index.html'))
+})
 
 // 404
 app.use('*', (req, res) => {

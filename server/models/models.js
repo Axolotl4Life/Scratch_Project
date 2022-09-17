@@ -34,9 +34,17 @@ const sessionSchema = new Schema({
 
 const Session = mongoose.model('session', sessionSchema);
 
+// ? Implement as Linked List >> strecth 
 const projectSchema = new Schema({
-  //properties of users: type
-});
+  // tasks, progress
+  tasks: {type: Object, default: {}},
+  progress: {
+    to_be_started: {type: Object, default: {}},
+    in_progress: {type: Object, default: {}},
+    completed: {type: Object, default: {}}
+  }
+}, {minimize: false}
+);
 
 const Project = mongoose.model('project', projectSchema);
 
