@@ -5,7 +5,6 @@ const sessionController = {};
 sessionController.isLoggedIn = (req, res, next) => {
   Session.findOne({ cookieId: req.cookies.ssid}, (err, session) => {
     if (err) {
-      console.log('Error in sessionController.isLoggedIn');
       return next('Error in sessionController.isLoggedIn' + JSON.stringify(err));
     }
     else if (!session) {
@@ -25,7 +24,18 @@ sessionController.startSession = (req, res, next) => {
   });
 };
 
-
+sessionController.logOut = (req, res, next) => {
+  Session.findOneAndDelete({ cookieId: req.cookies.ssid}, (err, session) => {
+    if (err) {
+      return next('Error in sessionController.logOut' + JSON.stringify(err));
+    } else if (!session) {
+      return next();
+    } else {
+      res.locals.session = session;
+      next();
+    }
+  });
+};
 
 
 

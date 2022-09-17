@@ -16,5 +16,9 @@ router.post('/login', userController.verifyUser, cookieController.setSSIDCookie,
   return res.status(200).redirect('/secret');
 });
 
+router.post('/logout', sessionController.logOut, (req, res) => {
+  return res.status(200).redirect('/login');
+});
+
 
 module.exports = router;

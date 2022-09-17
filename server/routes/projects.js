@@ -12,17 +12,17 @@ router.get('/all', projectController.getAllTasks, (req, res) => {
 
 // router for post requests create a new project
 router.post('/project', projectController.createNewProject, (req, res) => {
-  res.sendStatus(200);
+  res.status(200).json(res.locals.newProject);
 });
 
 // router for post requests create a new task
-router.post('/task', projectController.createNewTask, (req, res) => {
+router.post('/task', projectController.createNewTask, projectController.updateTaskProgress, (req, res) => {
   res.sendStatus(200);
 });
 
 // router for patch requests for tasks
 router.patch('/task', projectController.editTask, (req, res) => {
-  res.sendStatus(200);
+  res.status(200).json(res.locals.updatedTask);
 });
 
 // router for patch requests to change task location
