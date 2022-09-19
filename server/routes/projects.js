@@ -17,7 +17,7 @@ router.post('/project', projectController.createNewProject, (req, res) => {
 
 // router for post requests create a new task
 router.post('/task', projectController.createNewTask, projectController.updateTaskProgress, (req, res) => {
-  res.sendStatus(200);
+  res.status(200).json(res.locals.newTask);
 });
 
 // router for patch requests for tasks
@@ -32,12 +32,12 @@ router.patch('/updateTask', projectController.updateTaskProgress, (req, res) => 
 
 // router for delete requests for whole projects
 router.delete('/project', projectController.deleteProject, (req, res) => {
-  res.sendStatus(200);
+  res.status(200).json(res.locals.deletedProject);
 });
 
 // router for delete requests for tasks 
 router.delete('/task', projectController.deleteTask, (req, res) => {
-  res.sendStatus(200);
+  res.status(200).json(res.locals.deletedTask);
 });
 
 
