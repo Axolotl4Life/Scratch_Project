@@ -1,10 +1,9 @@
 // import e from 'express';
 import React, { Component, useState, useEffect } from 'react';
-import taskCreator from './FormContainer.jsx';
 
-const TaskContainer = () => {
+const TaskContainer = ({todo}) => {
 
-
+  console.log(todo);
   // function CreateTask({ addTask }){
   //   const [task, setTask] = useState('');
 
@@ -31,7 +30,7 @@ const TaskContainer = () => {
         Delete
         </button>
         <div>
-          {/* {this.props.value} */}
+        
         </div>
       </div>
       <div className="toBe" id="middleBox">

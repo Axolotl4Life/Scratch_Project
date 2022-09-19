@@ -67,15 +67,43 @@ projectController.updateTaskProgress = async(req, res, next) => {
   try {
     // const {task} = req.body;
     const {_id} = req.body;
+    const {task} = req.body;
     console.log(_id);
-    const firstSearch = await Project.findById({ 'progress.to_be_started': '6328951e6cab5a312c80de80'  });
+    const searchToBeStarted = `progress.to_be_started.${_id}`;
+    const firstSearch = await Project.findOne({ [searchToBeStarted] : { $exists : true }  });
 
-    console.log('Were gonna skate to one console log and one console log only => file: projectController.js => line 71 => firstSearch', firstSearch);
+    // console.log('file: projectController.js => line 71 => firstSearch', firstSearch);
 
-    const secondSearch = await Project.findOne({ 'progress.in_progress': _id });
+    const searchInProgress = `progress.in_progress.${_id}`;
+    const secondSearch = await Project.findOne({ [searchInProgress] : { $exists : true }  });
 
-    console.log('Were gonna skate to one console log and one console log only => file: projectController.js => line 75 => secondSearch', secondSearch);
+    // console.log('Were gonna skate to one console log and one console log only => file: projectController.js => line 75 => secondSearch', secondSearch);
 
+    // if first search returns something => go to in progress => progress.in_progress : id , delete from to_be_started
+    
+    if (firstSearch){
+      const firstUpdate = await Project.findOneAndUpdate({ [searchToBeStarted]: task}, { [searchInProgress]: task}, {new: true});
+      const firstDelete = await Project.findOneAndUpdate({ [searchToBeStarted]: task}, { $unset: {[searchToBeStarted]: task}}, {new: true});
+    }
+    else if (secondSearch){
+      const searchCompleted = `progress.completed.${_id}`;
+      const secondUpdate = await Project.findOneAndUpdate({ [searchInProgress]: task}, { [searchCompleted]: task}, {new: true});
+      const secondDelete = await Project.findOneAndUpdate({ [searchInProgress]: task}, { $unset: {[searchInProgress]: task}}, {new: true});
+    }
+    else {
+      // if we want more projects, have project id be in first argument so we can identify the project
+      const newUpdate = await Project.updateOne({}, { $set : { [searchToBeStarted] : task}}, {new: true});
+      console.log(newUpdate, 'newUpdate');
+    }
+    
+    
+    
+    
+    // if second search returns something => go to completed
+    
+    // if none, put in to be started
+
+    
     
 
     // receive the progress bar it's already in
