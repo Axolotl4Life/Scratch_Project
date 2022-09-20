@@ -10,6 +10,11 @@ router.get('/all', projectController.getAllTasks, (req, res) => {
   res.status(200).json(res.locals.allTasks);
 });
 
+// router for get project
+router.get('/project', projectController.getProject, (req, res) => {
+  res.status(200).json(res.locals.project);
+})
+
 // router for post requests create a new project
 router.post('/project', projectController.createNewProject, (req, res) => {
   res.status(200).json(res.locals.newProject);

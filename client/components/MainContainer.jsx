@@ -10,16 +10,25 @@ const MainContainer = () => {
   // handler function for submission > fetch post
 
   const submitTaskToDB = () => {
+    
     setTaskSubmission(task);
     console.log('inside submitTaskToDB');
+    console.log(taskSubmission);
     fetch('/projects/task', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: ''//state
+      body: JSON.stringify({task: task})
     })
-  }
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+      })
+      .catch(err => {
+        console.log('Error involving POST request to /projects/task');
+      });
+  };
 
   return (
     <div className="taskSub">
@@ -39,12 +48,12 @@ const MainContainer = () => {
         </label>
         {/* <input type='submit' value={task}>Add Sprint</input> */}
         
-        {/* <button className="newTask" id="sprintBut" >
+        <button className="newTask" id="sprintBut" onClick={() => {submitTaskToDB()}} >
         Add Sprint
-        </button> */}
+        </button>
       
       </form> 
-      <TaskContainer todo={task} />      
+      <TaskContainer todo={taskSubmission} />      
     </div>
   );
 };
