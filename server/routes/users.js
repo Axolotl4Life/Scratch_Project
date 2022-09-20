@@ -1,3 +1,5 @@
+//! NONE OF THE USERS/SIGNUP/LOGIN FUNCTIONALITY IS TESTED
+
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');

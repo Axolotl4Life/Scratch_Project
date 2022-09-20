@@ -3,16 +3,12 @@ const {Project, Task} = require('../models/models');
 
 const projectController = {};
 
-// TODO finish these methods:
-
-// async functions to let code continue and whenever mongoose finishes executing the db command we get it in our res.locals object
+//! Everything works with postman, only create new task and update progress work with frontend, good luck :)
 
 projectController.getAllTasks = async(req, res, next) => {
   try {
-    // second argument is name of property we want to display
-    const searchResults = await Project.find({}, ['tasks']);
+    const searchResults = await Task.find({});
     res.locals.allTasks = searchResults;
-
     return next();
   } 
   catch (error) {
@@ -25,106 +21,142 @@ projectController.getAllTasks = async(req, res, next) => {
 
 projectController.createNewTask = async(req, res, next) => {
   try {
-    // we get input from front end here as a json from body
     const {task} = req.body;
-    
     const newTask = await Task.create({task: task});
     res.locals.newTask = newTask;
-
     return next();
   } 
   catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: invalid format/type for tasks.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: invalid format/type for tasks ${error}`}
+      log: 'projectController.createNewTask: ERROR: invalid format/type for tasks.',
+      message: {err : `Error has occured in projectController.createNewTask. ERROR: invalid format/type for tasks ${error}`}
     });
   }
 };
 
 projectController.editTask = async(req, res, next) => {
   try {
-    // we get input from front end here as a json from body
-    const {id} = req.query; //? Unsure on this
-    const {update} = req.body;
+    const {_id} = req.query; //? Not yet tested on frontend
+    const {task} = req.body;
+
     
-    // first argument is the filer-what to find, second is what to update it to, third argument is to return the updated task
-    const updatedTask = await Project.findByIdAndUpdate({ _id: id}, {update});
+    const updatedTask = await Task.findByIdAndUpdate({ _id: _id}, {task}, {new : true});
     res.locals.updatedTask = updatedTask;
     
     return next();
   } 
   catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
+      log: 'projectController.editTask: ERROR: task not found.',
+      message: {err : `Error has occured in projectController.editTask. ERROR: task not found ${error}`}
     });
   }
 };
 
+/*
+projectController.updateTaskProgress -> We intended this middleware to run both when a task is created and whenever a user
+pushes a button to advance a task into the next 'bucket' (to be started > in progress).
+
+*/
+
 projectController.updateTaskProgress = async(req, res, next) => {
   try {
+    const {_id} = res.locals.newTask;
+    const {task} = res.locals.newTask;
+
+    // Looks to see if the task with unique ID is in the to_be_started bucket
+    const searchToBeStarted = `progress.to_be_started.${_id}`;
+    const firstSearch = await Project.findOne({ [searchToBeStarted] : { $exists : true }  });
+
+    // Looks to see if the task with unique ID is in the in_progress bucket
+    const searchInProgress = `progress.in_progress.${_id}`;
+    const secondSearch = await Project.findOne({ [searchInProgress] : { $exists : true }  });
+
+
+    // If the task with unique ID is in to_be_started, advance it to in_progress
+    if (firstSearch){
+      const firstUpdate = await Project.findOneAndUpdate({ [searchToBeStarted]: task}, { [searchInProgress]: task}, {new: true});
+      const firstDelete = await Project.findOneAndUpdate({ [searchToBeStarted]: task}, { $unset: {[searchToBeStarted]: task}}, {new: true});
+    }
+    // If the task with unique ID is in in_progress, advance it to completed
+    else if (secondSearch){
+      const searchCompleted = `progress.completed.${_id}`;
+      const secondUpdate = await Project.findOneAndUpdate({ [searchInProgress]: task}, { [searchCompleted]: task}, {new: true});
+      const secondDelete = await Project.findOneAndUpdate({ [searchInProgress]: task}, { $unset: {[searchInProgress]: task}}, {new: true});
+    }
+    else {
+      
+      //! if we want more projects, have project id be in first argument so we can identify the project
+      
+      const newUpdate = await Project.updateOne({}, { $set : { [searchToBeStarted] : task}}, {new: true});
+      console.log(newUpdate, 'newUpdate');
+    }
     
-    // receive the progress bar it's already in
-    // if just created move it to to_be_started
-    // else check if it's in to_be_started, if so move to in_progress
-    // else move to completed
+    
     
     return next();
   } catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
+      log: 'projectController.updateTaskProgress: ERROR: task not found.',
+      message: {err : `Error has occured in projectController.updateTaskProgress. ERROR: task not found ${error}`}
     });
   }
 };
 
 projectController.deleteTask = async(req, res, next) => {
   try {
-    // we get input from front end here as a json from body
-    const {id} = req.query; 
-     
-    // finds by id and deletes it
-    const deletedTask = await Project.findByIdAndDelete({ _id: id});
+    const {_id} = req.query; 
+    const deletedTask = await Task.findByIdAndRemove({ _id: _id});
     res.locals.deletedTask = deletedTask;
     return next();
   } 
   catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
+      log: 'projectController.deleteTask: ERROR: task not found.',
+      message: {err : `Error has occured in projectController.deleteTask. ERROR: task not found ${error}`}
+    });
+  }
+};
+
+projectController.getProject = async(req, res, next) => {
+  try {
+   const project = await Project.findOne({});
+   res.locals.project = project;
+   return next();
+  } catch {
+    return next({
+      log: 'projectController.getProject: ERROR: invalid format for project.',
+      message: {err : `Error has occured in projectController.getProject. ERROR: invalid format for project ${error}`}
     });
   }
 };
 
 projectController.createNewProject = async(req, res, next) => {
   try {
-    // we get input from front end here as a json from body - user has to name new project
-    const {projectName} = req.body;
-
-    const newProject = await Project.create({name: projectName});
+    const {name} = req.body;
+    const newProject = await Project.create({name: name});
     res.locals.newProject = newProject;
     return next();
 
   } catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
+      log: 'projectController.createNewProject: ERROR: invalid format for project.',
+      message: {err : `Error has occured in projectController.createNewProject. ERROR: invalid format for project ${error}`}
     });
   }
 };
 
 projectController.deleteProject = async(req, res, next) => {
   try {
-    // we get input from front end here as a json from body - user has to name new project
-    const {projectName} = req.body;
-
-    const deleteMe = await Project.findByIdAndDelete({name: projectName});
+    const {name} = req.body;
+    const deleteMe = await Project.findOneAndRemove({name: name});
+    res.locals.deletedProject = deleteMe;
     return next();
 
   } catch (error) {
     return next({
-      log: 'projectController.getAllTasks: ERROR: no tasks exist for this project yet.',
-      message: {err : `Error has occured in projectController.getAllTasks. ERROR: no tasks exist for this project yet ${error}`}
+      log: 'projectController.deleteProject: ERROR: project not found.',
+      message: {err : `Error has occured in projectController.deleteProject. ERROR: project not found ${error}`}
     });
   }
 };

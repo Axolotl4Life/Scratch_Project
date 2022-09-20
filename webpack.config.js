@@ -39,10 +39,12 @@ module.exports = {
       publicPath: 'build', // used to be /build
       directory: path.resolve(__dirname, 'build') // unsure about contents of static
     },
+    historyApiFallback : true,
     proxy: {
-      '/projects/**':{
+      '/**':{
         target: 'http://localhost:3000',
-        secure: false
+        secure: false,
+        changeOrigin: true
       } 
     }
   }

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// BELOW IS TEAM AXOLOTL'S DB -> YOU CAN USE YOUR OWN OR BE ADDED AS MEMBERS TO THIS DB
 const DB_URI = 'mongodb+srv://GoogleHireUs:750kTCminimum@cluster0.rjybe0z.mongodb.net/?retryWrites=true&w=majority';
 
 
@@ -13,7 +14,6 @@ mongoose.connect(DB_URI, {
   .catch(err => console.log(err));
 
 
-// TODO begin creating schemas below
 // minimize: false overrides default behavior of not saving empty arrays/objects
 const userSchema = new Schema({
   username: {type: String, required: true, unique: true},
@@ -36,9 +36,7 @@ const Session = mongoose.model('session', sessionSchema);
 
 // ? Implement as Linked List >> strecth 
 const projectSchema = new Schema({
-  // tasks, progress
   name: {type: String, required: true},
-  // tasks: { type: Schema.Types.ObjectId, ref: 'task'},
   progress: {
     to_be_started: {type: Object, default: {}},
     in_progress: {type: Object, default: {}},
@@ -51,7 +49,6 @@ const Project = mongoose.model('project', projectSchema);
 
 
 const taskSchema = new Schema({
-  // tasks, progress
   task: {type: String, required: true}
 });
 
